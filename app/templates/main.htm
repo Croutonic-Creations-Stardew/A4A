@@ -13,9 +13,6 @@
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
 
-		<!-- Light Base color #10EFB8 - Prot. #352d14 Duet. #4b2117 Trit. #068798 -->
-		<!-- -->
-		<!-- Dark Base Color #303332 - Prot. #292c2e Duet. #2a2d2f Trit. #292d2f -->
 		{{ require('app/application/theme.php') }}
 
 	</head>
@@ -26,25 +23,7 @@
 					<!-- <img class="logo" src="assets/images/logo.png"> -->
 					Access For All
 				</a>
-				<a href="/" class="item {{ @module == 'dashboard' ? 'active' : '' }}">Discover</a>
-				<!-- <div class="ui simple dropdown item">
-					Dropdown <i class="dropdown icon"></i>
-					<div class="menu">
-						<a class="item" href="#">Link Item</a>
-						<a class="item" href="#">Link Item</a>
-						<div class="divider"></div>
-						<div class="header">Header Item</div>
-						<div class="item">
-							<i class="dropdown icon"></i>
-							Sub Menu
-							<div class="menu">
-								<a class="item" href="#">Link Item</a>
-								<a class="item" href="#">Link Item</a>
-							</div>
-						</div>
-						<a class="item" href="#">Link Item</a>
-					</div>
-				</div> -->
+				{{ (require('app/application/menu.php')) == -1 ? '' : '' }}
 				<div class="right menu">
 				    <!-- <div class="item">
 				      	<div class="ui icon input">
@@ -83,6 +62,7 @@
 
 <script>
 	$(document).ready(function() {
+		//adjust main window offset just in case the top menu is somehow bigger or smaller.
 		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 'px');
 	});
 </script>
