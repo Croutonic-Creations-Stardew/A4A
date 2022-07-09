@@ -1,0 +1,39 @@
+<style type="text/css">
+    .column {
+        max-width: 450px;
+    }
+</style>
+
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <form class="ui large form" method="POST">
+            <div class="ui stacked segment">
+
+                <h2 class="ui header">
+                    <div class="content">
+                        Log In
+                    </div>
+                </h2>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="user" placeholder="Username / Email">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="Password">
+                    </div>
+                </div>
+                <button type="submit" class="ui fluid large teal submit button">Login</button>
+            </div>
+
+            <div class="ui error message"></div>
+      </form>
+        <div class="ui message">
+            New to A4A? <a href="/auth/register">Sign Up</a>
+        </div>
+    </div>
+</div>
