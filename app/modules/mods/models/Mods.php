@@ -6,6 +6,22 @@ class Mods extends \Model {
         return !empty($this->db->all("SELECT uid FROM mod_catalog WHERE game_id=? AND name=?", [$game_id, $name]));
     }
 
+    public function get_owner_data($mod_catalog_id) {
+        return [
+            'pending_rejected_files' => $this->db->all("
+                SELECT
+                    mod_attached_files.*,
+                    attached_file_status.description as status_description
+                FROM
+                    mod_attached_files
+                LEFT JOIN attached_file_status ON attached_file_status.uid=mod_attached_files.status
+                WHERE
+                    mod_catalog_id=?
+                    AND status IN (1,2,3,5)
+            ", [$mod_catalog_id]),
+        ];
+    }
+
     public function get_user($user_id) {
 
         $output = [];

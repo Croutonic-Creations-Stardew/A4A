@@ -75,19 +75,21 @@
                 <button class="ui primary button">New Version</button>
                 <button class="ui secondary button">Change Current Version</button>
                 <button class="ui secondary button">Add Changelog</button>
-                <button class="ui secondary button">Pending / Rejected Files</button>
+                <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
             </div>
         </check>
 
         <div class="ui styled fluid accordion">
-            <div class="active title">
-                <i class="dropdown icon"></i>
-                Current Version - {{ @data[files][current][version] }}
-            </div>
-            <div class="active content">
-                <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
-            </div>
 
+            <check if="{{ !empty(@data[files][current] )}}">
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    Current Version - {{ @data[files][current][version] }}
+                </div>
+                <div class="active content">
+                    <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
+                </div>
+            </check>
             <check if="{{ !empty(@data[files][other]) }}">
                 <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
                     <div class="title">
@@ -105,6 +107,42 @@
 </div>
 
 <check if="{{ @is_owner }}">
+    <div id="pending_rejected_files_modal" class="ui modal">
+            <div class="content">
+                <check if="{{ empty(@owner_data[pending_rejected_files]) }}">
+                    <true>You have no pending or rejected files!</true>
+                    <false>
+                        <table class="ui table">
+                            <thead>
+                                <tr>
+                                    <th>File</file>
+                                    <th>Status</th>
+                                    <th>Reason</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <repeat group="{{ @owner_data[pending_rejected_files] }}" value="{{ @file }}">
+                                    <tr>
+                                        <td>{{ @file['filename'] }}</td>
+                                        <td>{{ @file['status_description'] }}</td>
+                                        <td>{{ @file['rejection_reason'] ?: 'N/A' }}</td>
+                                        <td>{{ date('Y-m-d h:i A', strtotime(@file['submitted_timestamp'])) }}</td>
+                                    </tr>
+                                </repeat>
+                            </tbody>
+                        </table>
+
+                    </false>
+                </check>
+            </div>
+            <div class="actions">
+                <div class="ui red cancel inverted button">
+                    <i class="remove icon"></i>
+                        Close
+                </div>
+            </div>
+    </div>
     <div id="update_description_modal" class="ui basic modal">
             <div class="content">
                 <form id="edit_description_form" class="ui large form" method="POST">
@@ -129,6 +167,9 @@
     </div>
     <script>
         $(document).ready(function() {
+            $('#view_pending_rejected_files_button').on('click', function() {
+                    $('#pending_rejected_files_modal').modal('show');
+            });
             $('#edit_description_button').on('click', function() {
                 $('#update_description_modal').modal('show');
 

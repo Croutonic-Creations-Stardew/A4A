@@ -7,8 +7,12 @@
     }
 </style>
 
-<div class="ui segment">
-    <h1>Mods for {{ @data[0][game_name] }}</h1>
+<div class="ui segment" style="min-height: 150px">
+    <h1>Mods for {{ @game_data[game][name] }}</h1>
+
+    <check if="{{ empty(@data) }}">
+        <div class="ui yellow message"><b>Oh No!</b><br>It looks like there are no mods for this game yet.</div>
+    </check>
 
     <div class="ui link cards">
         <repeat group="{{ @data }}" value="{{ @mod }}">

@@ -8,7 +8,10 @@ class controller extends \Controller {
 		if(empty($game_id)) die('No game_id specified');
 
 		$mods = $this->model('Mods');
+		$catalog = $this->model('Catalog', 'discover');
+
 		$this->f3->set('data', $mods->get_mods($game_id));
+		$this->f3->set('game_data', $catalog->get_game($game_id));
 
 		echo $this->render('index');
 	}
@@ -16,6 +19,8 @@ class controller extends \Controller {
 	function details() {
 
 		$mod_catalog_id = $_GET['uid'];
+		$is_owner = $mod_info['info']['owner'] == $_SESSION['user']['uid'] || $_SESSION['user']['is_admin'];
+
 		if(empty($mod_catalog_id)) die('No mod catalog ID given...');
 
 		$mods = $this->model('Mods');
@@ -25,7 +30,7 @@ class controller extends \Controller {
 			$this->requires_account();
 
 			$mod_info = $mods->get_mod($mod_catalog_id);
-			if($mod_info['info']['owner'] == $_SESSION['user']['uid'] || $_SESSION['user']['is_admin']) {
+			if($is_owner) {
 
 				$update = [];
 
@@ -47,6 +52,9 @@ class controller extends \Controller {
 		}
 
 		$this->f3->set('data', $mod_info ?: $mods->get_mod($mod_catalog_id));
+		if($is_owner) {
+			$this->f3->set('owner_data', $mods->get_owner_data($mod_catalog_id));
+		}
 
 		echo $this->render('details');
 	}
