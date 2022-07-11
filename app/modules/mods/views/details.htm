@@ -1,0 +1,175 @@
+<script src="https://cdn.tiny.cloud/1/0tbw7pe7xhv03chz9ja4vltmnnehhjahvru1qw1s1htlsaxu/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<style>
+    img {
+        float: left !important;
+        width:  100% !important;
+        height: 200px !important;
+        object-fit: contain !important;
+    }
+    .ui.inverted.menu:not(#site_main_menu) {
+        border-bottom: 1px solid white !important;
+        padding-top: 2px;
+    }
+    .ui.segment {
+        background-color: #282828;
+        color: white;
+    }
+    .sub.header {
+        color: inherit !important;
+    }
+    .ui.segment .header {
+        color: white;
+    }
+    #details_submenu.ui.menu .item:not(.active) {
+        background-color: #1b1c1d;
+        color: white;
+    }
+    #details_submenu.ui.menu .item.active {
+        background-color: #3d3e3f;
+        color: white;
+    }
+</style>
+
+<set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
+
+<div class="ui primary segment">
+    <div class="ui buttons">
+        <button onclick="history.back();" class="ui primary button">Go Back</button>
+    </div>
+</div>
+
+<div class="ui white segment">
+
+    <div id="details_submenu" class="ui top attached tabular menu">
+        <a class="item active" data-tab="first">Information</a>
+        <check if="{{ !empty(@data[files][current]) || @is_owner }}">
+            <a class="item" data-tab="second">Downloads</a>
+        </check>
+    </div>
+    <div class="ui bottom attached tab segment active" data-tab="first">
+        <h2 class="ui header">
+            {{ @data[info][name] }}
+            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+        </h2>
+        <div class="ui white segment">
+
+            <h3>
+                Description
+                <check if="{{ @is_owner }}">
+                    <button id="edit_description_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+            <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p>
+        </div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="second">
+
+        <h2 class="ui header">
+            {{ @data[info][name] }}
+            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+        </h2>
+
+        <check if="{{ @is_owner }}">
+            <div class="ui primary segment">
+                <button class="ui primary button">New Version</button>
+                <button class="ui secondary button">Change Current Version</button>
+                <button class="ui secondary button">Add Changelog</button>
+                <button class="ui secondary button">Pending / Rejected Files</button>
+            </div>
+        </check>
+
+        <div class="ui styled fluid accordion">
+            <div class="active title">
+                <i class="dropdown icon"></i>
+                Current Version - {{ @data[files][current][version] }}
+            </div>
+            <div class="active content">
+                <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
+            </div>
+
+            <check if="{{ !empty(@data[files][other]) }}">
+                <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Old Version - {{ @file[version] }}
+                    </div>
+                    <div class="content">
+                        <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Old Version</a>
+                    </div>
+                </repeat>
+            </check>
+        </div>
+    </div>
+
+</div>
+
+<check if="{{ @is_owner }}">
+    <div id="update_description_modal" class="ui basic modal">
+            <div class="content">
+                <form id="edit_description_form" class="ui large form" method="POST">
+                    <div class="field">
+                        <div class="ui left icon large input">
+                            <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
+                            <textarea id="edit_description" name="change_description" placeholder="Description" required>{{ @data[info][description] }}</textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui red basic cancel inverted button">
+                    <i class="remove icon"></i>
+                        Close
+                </div>
+                <button form="edit_description_form" type="submit" class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Update
+                </button>
+            </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#edit_description_button').on('click', function() {
+                $('#update_description_modal').modal('show');
+
+                setTimeout(function() {
+                    tinymce.init({
+                        selector: '#edit_description',
+                        auto_focus: 'edit_description',
+                        width: '100%',
+                        height: '85vh',
+                        plugins: [
+                            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'paste'
+                        ],
+                        toolbar: 'undo redo | blocks | ' +
+                        'bold italic backcolor | alignleft aligncenter ' +
+                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                        'removeformat | help',
+                        forced_root_blocks: true,
+                        paste_as_text: true,
+                        table_default_attributes: {
+                            class: 'ui table'
+                        }
+                    });
+                }, 300);
+
+            });
+
+            // prevent fomantic from hijacking TinyMCE modal focus
+            $(document).on('focusin', function(e) {
+              if ($(e.target).closest(".mce-window").length) {
+                e.stopImmediatePropagation();
+              }
+            });
+        });
+    </script>
+</check>
+
+<script>
+    $(document).ready(function() {
+        $('.menu .item').tab();
+        $('.ui.accordion').accordion();
+    });
+</script>

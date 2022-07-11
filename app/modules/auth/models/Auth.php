@@ -39,7 +39,7 @@ class Auth extends \Model {
     }
 
     private function login_user($uid, $password) {
-        
+
         $user = $this->db->row('SELECT * FROM users WHERE uid=?', [$uid]);
 
         if(password_verify($password, $user['password'])) {
@@ -47,7 +47,7 @@ class Auth extends \Model {
             $_SESSION['user'] = $user;
             return;
         } else {
-            return 'Username or password is incorrect.';
+            return 'The given username/email or password does not match our records.';
         }
 
     }

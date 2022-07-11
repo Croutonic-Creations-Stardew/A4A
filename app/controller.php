@@ -66,4 +66,10 @@ class Controller {
 		return new $class();
 	}
 
+	public function requires_account() {
+		if(empty($_SESSION['user'])) {
+			$this->f3->reroute('/');
+		}
+	}
+
 }

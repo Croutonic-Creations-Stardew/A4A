@@ -1,0 +1,29 @@
+<style>
+    img {
+        float: left !important;
+        width:  100% !important;
+        height: 200px !important;
+        object-fit: contain !important;
+    }
+</style>
+
+<div class="ui segment">
+    <h1>Mods for {{ @data[0][game_name] }}</h1>
+
+    <div class="ui link cards">
+        <repeat group="{{ @data }}" value="{{ @mod }}">
+            <a href="/mods/details?uid={{ @mod['uid'] }}" class="secondary card">
+        		<!-- <div class="image">
+        			<img src="{{ @game['thumbnail'] }}">
+        		</div> -->
+        		<div class="content">
+        			<h2 class="ui header">
+                        {{ @mod['name'] }}
+                        <div class="sub header">Author: {{ @mod[author] }}</div>
+                    </h2>
+        		</div>
+        	</a>
+
+        </repeat>
+    </div>
+</div>

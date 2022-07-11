@@ -13,14 +13,15 @@
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
 
-		{{ require('app/application/theme.php') }}
+		{{ (require('app/application/theme.php')) == -1 ? '' : '' }}
 
 	</head>
 	<body>
-		<div id="site_main_menu" class="ui fixed menu">
+		<div id="site_main_menu" class="ui fixed inverted menu">
 			<div class="ui container">
 				<a href="/" class="header item">
 					<!-- <img class="logo" src="assets/images/logo.png"> -->
+					<i class="universal access large icon"></i>
 					Access For All
 				</a>
 				{{ (require('app/application/menu.php')) == -1 ? '' : '' }}
@@ -36,6 +37,7 @@
 							<div class="ui simple dropdown item">
 								{{ @SESSION.user['display_name'] }} <i class="dropdown icon"></i>
 								<div class="menu">
+									<a class="item" href="/mods/user?user_id={{ @SESSION.user['uid'] }}">My Mods</a>
 									<a class="item" href="/auth/logout">Log Out</a>
 								</div>
 							</div>
@@ -52,7 +54,11 @@
 		</div>
 		<div id="site_main_container" class="ui container">
 			<check if="{{ @site_error }}">
-				<div class="ui red message"><h1 class="title">THERE WAS AN ERROR</h1><i class="close icon"></i><br>{{ @site_error }}</div>
+				<div class="ui red message">
+					<h1 class="title">Oof</h1>
+					<p>{{ @site_error }}</p>
+					<i class="close clear icon"></i>
+				</div>
 			</check>
 			<include href="{{ @content }}" />
 		</div>
@@ -62,7 +68,13 @@
 
 <script>
 	$(document).ready(function() {
-		//adjust main window offset just in case the top menu is somehow bigger or smaller.
-		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 'px');
+		//adjust main window offset to clear the menu header
+		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 20 + 'px');
+
+		$('.ui.dropdown').dropdown({
+			ignoreDiacritics: true,
+    		sortSelect: true,
+    		fullTextSearch:'exact'
+  		});
 	});
 </script>

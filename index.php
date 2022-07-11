@@ -11,6 +11,8 @@ if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' ||
    exit();
 }
 
+ini_set('session.gc_maxlifetime', 315360000);
+
 session_start();
 
 require_once("app/application/vendor/fat-free-framework-3.6.4/base.php");
