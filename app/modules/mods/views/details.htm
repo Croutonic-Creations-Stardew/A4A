@@ -1,5 +1,3 @@
-<script src="https://cdn.tiny.cloud/1/0tbw7pe7xhv03chz9ja4vltmnnehhjahvru1qw1s1htlsaxu/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
 <style>
     img {
         float: left !important;
@@ -60,7 +58,10 @@
                     <button id="edit_description_button" class="ui mini green button">Edit</button>
                 </check>
             </h3>
-            <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p>
+
+          <div id="viewer"></div>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="second">
@@ -74,12 +75,12 @@
             <div class="ui primary segment">
                 <button class="ui primary button">New Version</button>
                 <button class="ui secondary button">Change Current Version</button>
-                <button class="ui secondary button">Add Changelog</button>
+                <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
                 <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
             </div>
         </check>
 
-        <div class="ui styled fluid accordion">
+        <div class="ui styled fluid accordion" style="color: black;">
 
             <check if="{{ !empty(@data[files][current] )}}">
                 <div class="active title">
@@ -88,6 +89,14 @@
                 </div>
                 <div class="active content">
                     <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
+                    <check if="{{ !empty(@data[changelogs][@data[files][current][version]]) }}">
+                        <h3>Changelog</h3>
+                        <ul>
+                            <repeat group="{{ @data[changelogs][@data[files][current][version]] }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </check>
                 </div>
             </check>
             <check if="{{ !empty(@data[files][other]) }}">
@@ -98,6 +107,14 @@
                     </div>
                     <div class="content">
                         <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Old Version</a>
+                        <check if="{{ !empty(@data[changelogs][@file[version]]) }}">
+                            <h3>Changelog</h3>
+                            <ul>
+                                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                                    <li>{{ @log }}</li>
+                                </repeat>
+                            </ul>
+                        </check>
                     </div>
                 </repeat>
             </check>
@@ -105,6 +122,55 @@
     </div>
 
 </div>
+
+<div id="update_description_modal" class="ui modal">
+        <div class="content">
+            <form id="edit_description_form" class="ui large form" method="POST">
+                <div class="field">
+                    <div class="ui left icon large input">
+                        <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
+                        <textarea id="edit_description" name="change_description" style="display: none;" required>{{ @data[info][description] }}</textarea>
+                        <div id="editor" style="width: 100%"></div>
+                        <script>
+                            var editor = new Editor({
+                                el: document.querySelector('#editor'),
+                                height: '500px',
+                                initialEditType: 'wysiwyg',
+                                previewStyle: 'vertical',
+                                initialValue: $('#edit_description').val()
+                            });
+                            editor.removeToolbarItem('image');
+                        </script>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui red cancel inverted button">
+                <i class="remove icon"></i>
+                    Close
+            </div>
+            <button type="button" class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Update
+            </button>
+        </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.menu .item').tab();
+        $('.ui.accordion').accordion();
+
+        var viewer = $('#viewer');
+        viewer.html(editor.getHTML());
+
+        //dynamically add table styling from generated markdown html
+        viewer.find('table').addClass('ui striped compact celled sortable table')
+
+
+    });
+</script>
 
 <check if="{{ @is_owner }}">
     <div id="pending_rejected_files_modal" class="ui modal">
@@ -143,58 +209,67 @@
                 </div>
             </div>
     </div>
-    <div id="update_description_modal" class="ui basic modal">
+
+    <div id="add_changelog_modal" class="ui modal">
             <div class="content">
-                <form id="edit_description_form" class="ui large form" method="POST">
+                <form id="add_changelog_form" class="ui large form" method="POST">
                     <div class="field">
                         <div class="ui left icon large input">
                             <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
-                            <textarea id="edit_description" name="change_description" placeholder="Description" required>{{ @data[info][description] }}</textarea>
+                            <div class="ui left icon large input">
+                                <div class="ui fluid search selection dropdown">
+                                    <i aria-hidden="true" style="color: #8f8f8f; margin-left: -5px;" class="code branch icon"></i>
+                                	<input type="hidden" name="changelog_version" required>
+                                	<i aria-hidden="true" class="dropdown icon"></i>
+                                	<div class="default text">Choose Version</div>
+                                	<div class="menu">
+                                        <repeat group="{{ @owner_data[all_versions] }}" value="{{ @version }}">
+                                            <div class="item" data-value="{{ @version }}">{{ @version }}</div>
+                                        </repeat>
+                                	</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon large input">
+                            <i aria-hidden="true" class="highlighter icon" style="margin-top: 25px; height: unset;"></i>
+                            <textarea name="add_changelogs" required placeholder="Enter a change log, each line is a new entry for the selected version."></textarea>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="actions">
-                <div class="ui red basic cancel inverted button">
+                <div class="ui red cancel inverted button">
                     <i class="remove icon"></i>
                         Close
                 </div>
-                <button form="edit_description_form" type="submit" class="ui green ok inverted button">
+                <button form="add_changelog_form" type="submit" class="ui green ok inverted button">
                     <i class="checkmark icon"></i>
-                    Update
+                    Post Changelogs
                 </button>
             </div>
     </div>
     <script>
         $(document).ready(function() {
+            $('#add_changelog_button').on('click', function() {
+                $('#add_changelog_modal').modal('show');
+            });
             $('#view_pending_rejected_files_button').on('click', function() {
-                    $('#pending_rejected_files_modal').modal('show');
+                $('#pending_rejected_files_modal').modal('show');
             });
             $('#edit_description_button').on('click', function() {
-                $('#update_description_modal').modal('show');
+                $('#update_description_modal').modal({
+                    onApprove: function() {
+                        $('#edit_description').val(editor.getMarkdown());
+                        $('#edit_description_form').submit();
+                    }
+                }).modal('show');
 
-                setTimeout(function() {
-                    tinymce.init({
-                        selector: '#edit_description',
-                        auto_focus: 'edit_description',
-                        width: '100%',
-                        height: '85vh',
-                        plugins: [
-                            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                            'insertdatetime', 'media', 'table', 'help', 'wordcount', 'paste'
-                        ],
-                        toolbar: 'undo redo | blocks | ' +
-                        'bold italic backcolor | alignleft aligncenter ' +
-                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                        'removeformat | help',
-                        forced_root_blocks: true,
-                        paste_as_text: true,
-                        table_default_attributes: {
-                            class: 'ui table'
-                        }
-                    });
-                }, 300);
+                // $('#edit_description_form').on('submit', function(e) {
+                //     alert('test');
+                // });
 
             });
 
@@ -207,10 +282,3 @@
         });
     </script>
 </check>
-
-<script>
-    $(document).ready(function() {
-        $('.menu .item').tab();
-        $('.ui.accordion').accordion();
-    });
-</script>

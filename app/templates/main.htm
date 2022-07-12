@@ -5,13 +5,26 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Access For All</title>
 
-		<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
-
 		<!-- <link rel="icon" href="img/favicon.ico"> -->
 		<!-- CSS/JS FILES -->
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+
+		<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+		<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+		<style>
+			div.toastui-editor-main.toastui-editor-md-mode {
+				background-color: #f7f1f1;
+			}
+			div.toastui-editor-md-splitter {
+				background-color: #000;
+			}
+		</style>
+		<script>
+			const Editor = toastui.Editor;
+		</script>
 
 		{{ (require('app/application/theme.php')) == -1 ? '' : '' }}
 
