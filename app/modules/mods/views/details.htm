@@ -40,12 +40,15 @@
 <div class="ui white segment">
 
     <div id="details_submenu" class="ui top attached tabular menu">
-        <a class="item active" data-tab="first">Information</a>
+        <a class="item active" data-tab="information">Information</a>
         <check if="{{ !empty(@data[files][current]) || @is_owner }}">
-            <a class="item" data-tab="second">Downloads</a>
+            <a class="item" data-tab="downloads">Downloads</a>
+        </check>
+        <check if="{{ !empty(@data[changelogs]) }}">
+            <a class="item" data-tab="changelogs">Changelogs</a>
         </check>
     </div>
-    <div class="ui bottom attached tab segment active" data-tab="first">
+    <div class="ui bottom attached tab segment active" data-tab="information">
         <h2 class="ui header">
             {{ @data[info][name] }}
             <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
@@ -64,7 +67,43 @@
             <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
     </div>
-    <div class="ui bottom attached tab segment" data-tab="second">
+    <div class="ui bottom attached tab segment" data-tab="changelogs">
+        <h2 class="ui header">
+            {{ @data[info][name] }}
+            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+        </h2>
+        <div class="ui white segment">
+
+            <h2>Changelogs</h2>
+
+            <div class="ui styled fluid accordion" style="color: black;">
+                <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Version {{ @version }}
+                    </div>
+                    <div class="content">
+                        <ul>
+                            <repeat group="{{ @logs }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </div>
+                </repeat>
+            </div>
+
+
+            <ul>
+                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                    <li>{{ @log }}</li>
+                </repeat>
+            </ul>
+
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="downloads">
 
         <h2 class="ui header">
             {{ @data[info][name] }}
@@ -166,7 +205,7 @@
         viewer.html(editor.getHTML());
 
         //dynamically add table styling from generated markdown html
-        viewer.find('table').addClass('ui striped compact celled sortable table')
+        viewer.find('table').addClass('ui striped compact celled sortable inverted table')
 
 
     });
