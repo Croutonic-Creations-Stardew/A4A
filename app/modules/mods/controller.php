@@ -40,7 +40,16 @@ class controller extends \Controller {
 
 				if(!empty($_POST['add_changelogs'])) {
 					$logs = array_values(array_filter(explode(PHP_EOL, $_POST['add_changelogs'])));
-					$mods->post_changelogs($mod_catalog_id, $_POST['changelog_version'], $logs);
+					$mods->post_changelogs($mod_catalog_id, $_POST['version'], $logs);
+				}
+
+				if(!empty($_POST['update_type'])) {
+					switch($_POST['update_type']) {
+						case 'new_version_upload':
+							$filehost = $this->model('Filehost');
+							$filehost->upload_file($mod_catalog_id, $_POST['version'], $_FILES['host_file'], $_POST['set_current_version']);
+							break;
+					}
 				}
 
 				if(!empty($update)) {
@@ -75,7 +84,7 @@ class controller extends \Controller {
 
 				if(!empty($_FILES['host_file']['size'])) {
 					$filehost = $this->model('Filehost');
-					$filehost->upload_file($catalog_id, $_POST, $_FILES['host_file']);
+					$filehost->upload_file($catalog_id, $_POST['version'], $_FILES['host_file']);
 				}
 
 				$this->f3->reroute('/mods/user?user_id=' . $_SESSION['user']['uid']);

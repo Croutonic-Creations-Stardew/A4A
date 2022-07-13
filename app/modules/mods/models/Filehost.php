@@ -6,8 +6,14 @@ class Filehost extends \Model {
         return $this->db->row('SELECT * FROM mod_attached_files WHERE uid=?', [$file_id]);
     }
 
-    public function upload_file($game_catalog_id, $data, $file) {
-        //$data requires game_id, name, version
+    public function upload_file($game_catalog_id, $version, $file, $set_new_version = 0) {
+
+        $nfo = $this->db->row("
+            SELECT
+                m.game_id, m.name, g.name as game_name
+            FROM mod_catalog m
+            LEFT JOIN games g ON g.uid=m.game_id
+            WHERE m.uid=?", [$game_catalog_id]);
 
         $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
 
@@ -21,10 +27,8 @@ class Filehost extends \Model {
             die("Could not upload mod. We only accept files under {$max_mb}MB. If you need an exception to be made, please contact the developer.");
         }
 
-        $game_name = $this->db->cell('SELECT name FROM games WHERE uid=?', [$data['game_id']]);
-
-        $upload_path = "uploads/{$game_name}/{$data['name']}/";
-        $storage_name = "{$data['name']}-{$data['version']}.{$ext}";
+        $upload_path = "uploads/{$nfo['game_name']}/{$nfo['name']}/";
+        $storage_name = "{$nfo['name']}-{$version}.{$ext}";
 
         if(!is_dir($upload_path)) {
             mkdir($upload_path, 0777, true);
@@ -35,11 +39,12 @@ class Filehost extends \Model {
 
         if($moved) {
             $this->db->insert('mod_attached_files', [
-                'game_id' => $data['game_id'],
+                'game_id' => $nfo['game_id'],
                 'mod_catalog_id' => $game_catalog_id,
                 'path' => $upload_path,
                 'filename' => $storage_name,
-                'version' => $data['version']
+                'version' => $version,
+                'set_new_version_on_approval' => $set_new_version
             ]);
         }
 
