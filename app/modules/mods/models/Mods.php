@@ -127,6 +127,11 @@ class Mods extends \Model {
             'current_version' => $data['version']
         ]);
 
+        if(!empty($data['changelog'])) {
+            $logs = array_values(array_filter(explode(PHP_EOL, $_POST['changelog'])));
+            $this->post_changelogs($catalog_id, $data['version'], $logs);
+        }
+
         foreach($data['link_file'] ?: [] as $key => $link) {
             $description = $data['link_file_description'][$key];
             $this->db->insert('mod_attached_links', [
