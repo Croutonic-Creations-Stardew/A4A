@@ -20,6 +20,10 @@
         background-color: #3d3e3f;
         color: white;
     }
+
+    #viewer ul li p {
+        margin-bottom: 0px;
+    }
 </style>
 
 <set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
@@ -169,15 +173,6 @@
 
 <script>
     $(document).ready(function() {
-
-        var editor = new Editor({
-            el: document.querySelector('#editor'),
-            height: '500px',
-            initialEditType: 'wysiwyg',
-            previewStyle: 'vertical',
-            initialValue: $('#edit_description').val()
-        });
-        editor.removeToolbarItem('image');
 
         var viewer = $('#viewer');
         viewer.html(editor.getHTML());
