@@ -51,6 +51,9 @@
     <div class="ui bottom attached tab segment active" data-tab="information">
         <h2 class="ui header">
             {{ @data[info][name] }}
+            <check if="{{ !empty(@data[files][current]) }}">
+                <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
+            </check>
             <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
         </h2>
         <div class="ui white segment">
@@ -113,7 +116,7 @@
         <check if="{{ @is_owner }}">
             <div class="ui primary segment">
                 <button id="add_new_version_button"  class="ui primary button">New Version</button>
-                <button class="ui secondary button">Change Current Version</button>
+                <button id="change_current_version_button" class="ui secondary button">Change Current Version</button>
                 <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
                 <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
             </div>
@@ -334,8 +337,47 @@
             </div>
     </div>
 
+    <div id="change_current_version_modal" class="ui modal">
+            <div class="content">
+                <form id="change_current_version_form" class="ui large form" method="POST">
+                    <div class="field">
+                        <div class="ui left icon large input">
+                            <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
+                            <div class="ui left icon large input">
+                                <div class="ui fluid search selection dropdown">
+                                    <i aria-hidden="true" style="color: #8f8f8f; margin-left: -5px;" class="code branch icon"></i>
+                                	<input type="hidden" name="change_version" required>
+                                	<i aria-hidden="true" class="dropdown icon"></i>
+                                	<div class="default text">Choose Version</div>
+                                	<div class="menu">
+                                        <repeat group="{{ @owner_data[all_versions] }}" value="{{ @version }}">
+                                            <div class="item" data-value="{{ @version }}">{{ @version }}</div>
+                                        </repeat>
+                                	</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui red cancel inverted button">
+                    <i class="remove icon"></i>
+                        Close
+                </div>
+                <button form="change_current_version_form" type="submit" class="ui green ok inverted button">
+                    <i class="checkmark icon"></i>
+                    Change Current Version
+                </button>
+            </div>
+    </div>
+
     <script>
         $(document).ready(function() {
+            $('#change_current_version_button').on('click', function() {
+                $('#change_current_version_modal').modal('show');
+            });
             $('#add_changelog_button').on('click', function() {
                 $('#add_changelog_modal').modal('show');
             });

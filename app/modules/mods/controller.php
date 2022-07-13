@@ -38,6 +38,10 @@ class controller extends \Controller {
 					$update['description'] = $_POST['change_description'];
 				}
 
+				if(!empty($_POST['change_version'])) {
+					$update['current_version'] = $_POST['change_version'];
+				}
+
 				if(!empty($_POST['add_changelogs'])) {
 					$logs = array_values(array_filter(explode(PHP_EOL, $_POST['add_changelogs'])));
 					$mods->post_changelogs($mod_catalog_id, $_POST['version'], $logs);
@@ -54,8 +58,9 @@ class controller extends \Controller {
 
 				if(!empty($update)) {
 					$mods->update_mod($mod_catalog_id, $update);
-					$this->f3->reroute("/mods/details?uid={$mod_catalog_id}");
 				}
+
+				$this->f3->reroute("/mods/details?uid={$mod_catalog_id}");
 
 			} else {
 				die("You don't have permission to do that.");
