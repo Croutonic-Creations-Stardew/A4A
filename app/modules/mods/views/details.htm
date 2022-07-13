@@ -1,449 +1,189 @@
-<style>
-    img {
-        float: left !important;
-        width:  100% !important;
-        height: 200px !important;
-        object-fit: contain !important;
-    }
-    .ui.inverted.menu:not(#site_main_menu) {
-        border-bottom: 1px solid white !important;
-        padding-top: 2px;
-    }
-    .ui.segment {
-        background-color: #282828;
-        color: white;
-    }
-    .sub.header {
-        color: inherit !important;
-    }
-    .ui.segment .header {
-        color: white;
-    }
-    #details_submenu.ui.menu .item:not(.active) {
-        background-color: #1b1c1d;
-        color: white;
-    }
-    #details_submenu.ui.menu .item.active {
-        background-color: #3d3e3f;
-        color: white;
-    }
-</style>
-
-<set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
-
-<div class="ui primary segment">
-    <div class="ui buttons">
-        <button onclick="history.back();" class="ui primary button">Go Back</button>
-    </div>
-</div>
-
-<div class="ui white segment">
-
-    <div id="details_submenu" class="ui top attached tabular menu">
-        <a class="item active" data-tab="information">Information</a>
-        <check if="{{ !empty(@data[files][current]) || @is_owner }}">
-            <a class="item" data-tab="downloads">Downloads</a>
-        </check>
-        <check if="{{ !empty(@data[changelogs]) }}">
-            <a class="item" data-tab="changelogs">Changelogs</a>
-        </check>
-    </div>
-    <div class="ui bottom attached tab segment active" data-tab="information">
-        <h2 class="ui header">
-            {{ @data[info][name] }}
-            <check if="{{ !empty(@data[files][current]) }}">
-                <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
-            </check>
-            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
-        </h2>
-        <div class="ui white segment">
-
-            <h3>
-                Description
-                <check if="{{ @is_owner }}">
-                    <button id="edit_description_button" class="ui mini green button">Edit</button>
-                </check>
-            </h3>
-
-          <div id="viewer"></div>
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
-        </div>
-        <div class="ui white segment">
-
-            <h3>
-                Other Links
-                <check if="{{ @is_owner }}">
-                    <button id="edit_description_button" class="ui mini green button">Edit</button>
-                </check>
-            </h3>
-
-            <ul>
-                <repeat group="{{ @data[links] }}" value="{{ @nfo }}">
-                    <li><a target="_blank" href="{{ @nfo[href] }}">{{ @nfo[description] }}</a></li>
-                </repeat>
-            </ul>
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
-        </div>
-    </div>
-    <div class="ui bottom attached tab segment" data-tab="changelogs">
-        <h2 class="ui header">
-            {{ @data[info][name] }}
-            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
-        </h2>
-        <div class="ui white segment">
-
-            <h2>Changelogs</h2>
-
-            <div class="ui styled fluid accordion" style="color: black;">
-                <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}">
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        Version {{ @version }}
-                    </div>
-                    <div class="content">
-                        <ul>
-                            <repeat group="{{ @logs }}" value="{{ @log }}">
-                                <li>{{ @log }}</li>
-                            </repeat>
-                        </ul>
-                    </div>
-                </repeat>
-            </div>
-
-
-            <ul>
-                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
-                    <li>{{ @log }}</li>
-                </repeat>
-            </ul>
-
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
-        </div>
-    </div>
-    <div class="ui bottom attached tab segment" data-tab="downloads">
-
-        <h2 class="ui header">
-            {{ @data[info][name] }}
-            <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
-        </h2>
-
-        <check if="{{ @is_owner }}">
-            <div class="ui primary segment">
-                <button id="add_new_version_button"  class="ui primary button">New Version</button>
-                <button id="change_current_version_button" class="ui secondary button">Change Current Version</button>
-                <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
-                <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
-            </div>
-        </check>
-
-        <div class="ui styled fluid accordion" style="color: black;">
-
-            <check if="{{ !empty(@data[files][current] )}}">
-                <div class="active title">
-                    <i class="dropdown icon"></i>
-                    Current Version - {{ @data[files][current][version] }}
-                </div>
-                <div class="active content">
-                    <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
-                    <check if="{{ !empty(@data[changelogs][@data[files][current][version]]) }}">
-                        <h3>Changelog</h3>
-                        <ul>
-                            <repeat group="{{ @data[changelogs][@data[files][current][version]] }}" value="{{ @log }}">
-                                <li>{{ @log }}</li>
-                            </repeat>
-                        </ul>
-                    </check>
-                </div>
-            </check>
-            <check if="{{ !empty(@data[files][other]) }}">
-                <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        Old Version - {{ @file[version] }}
-                    </div>
-                    <div class="content">
-                        <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Old Version</a>
-                        <check if="{{ !empty(@data[changelogs][@file[version]]) }}">
-                            <h3>Changelog</h3>
-                            <ul>
-                                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
-                                    <li>{{ @log }}</li>
-                                </repeat>
-                            </ul>
-                        </check>
-                    </div>
-                </repeat>
-            </check>
-        </div>
-    </div>
-
-</div>
-
-<div id="update_description_modal" class="ui modal">
-        <div class="content">
-            <form id="edit_description_form" class="ui large form" method="POST">
-                <div class="field">
-                    <div class="ui left icon large input">
-                        <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
-                        <textarea id="edit_description" name="change_description" style="display: none;" required>{{ @data[info][description] }}</textarea>
-                        <div id="editor" style="width: 100%"></div>
-                        <script>
-                            var editor = new Editor({
-                                el: document.querySelector('#editor'),
-                                height: '500px',
-                                initialEditType: 'wysiwyg',
-                                previewStyle: 'vertical',
-                                initialValue: $('#edit_description').val()
-                            });
-                            editor.removeToolbarItem('image');
-                        </script>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="actions">
-            <div class="ui red cancel inverted button">
-                <i class="remove icon"></i>
-                    Close
-            </div>
-            <button type="button" class="ui green ok inverted button">
-                <i class="checkmark icon"></i>
-                Update
-            </button>
-        </div>
-</div>
-
-<script>
-    $(document).ready(function() {
-
-        var viewer = $('#viewer');
-        viewer.html(editor.getHTML());
-
-        //dynamically add table styling from generated markdown html
-        viewer.find('table').addClass('ui striped compact celled sortable inverted table')
-
-    });
-</script>
-
-<check if="{{ @is_owner }}">
-    <div id="pending_rejected_files_modal" class="ui modal">
-            <div class="content">
-                <check if="{{ empty(@owner_data[pending_rejected_files]) }}">
-                    <true>You have no pending or rejected files!</true>
-                    <false>
-                        <table class="ui table">
-                            <thead>
-                                <tr>
-                                    <th>File</file>
-                                    <th>Status</th>
-                                    <th>Reason</th>
-                                    <th>Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <repeat group="{{ @owner_data[pending_rejected_files] }}" value="{{ @file }}">
-                                    <tr>
-                                        <td>{{ @file['filename'] }}</td>
-                                        <td>{{ @file['status_description'] }}</td>
-                                        <td>{{ @file['rejection_reason'] ?: 'N/A' }}</td>
-                                        <td>{{ date('Y-m-d h:i A', strtotime(@file['submitted_timestamp'])) }}</td>
-                                    </tr>
-                                </repeat>
-                            </tbody>
-                        </table>
-
-                    </false>
-                </check>
-            </div>
-            <div class="actions">
-                <div class="ui red cancel inverted button">
-                    <i class="remove icon"></i>
-                        Close
-                </div>
-            </div>
-    </div>
-
-    <div id="add_changelog_modal" class="ui modal">
-            <div class="content">
-                <form id="add_changelog_form" class="ui large form" method="POST">
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
-                            <div class="ui left icon large input">
-                                <div class="ui fluid search selection dropdown">
-                                    <i aria-hidden="true" style="color: #8f8f8f; margin-left: -5px;" class="code branch icon"></i>
-                                	<input type="hidden" name="version" required>
-                                	<i aria-hidden="true" class="dropdown icon"></i>
-                                	<div class="default text">Choose Version</div>
-                                	<div class="menu">
-                                        <repeat group="{{ @owner_data[all_versions] }}" value="{{ @version }}">
-                                            <div class="item" data-value="{{ @version }}">{{ @version }}</div>
-                                        </repeat>
-                                	</div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="highlighter icon" style="margin-top: 25px; height: unset;"></i>
-                            <textarea name="add_changelogs" required placeholder="Enter a change log, each line is a new entry for the selected version."></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="actions">
-                <div class="ui red cancel inverted button">
-                    <i class="remove icon"></i>
-                        Close
-                </div>
-                <button form="add_changelog_form" type="submit" class="ui green ok inverted button">
-                    <i class="checkmark icon"></i>
-                    Post Changelogs
-                </button>
-            </div>
-    </div>
-
-    <div id="add_new_version_modal" class="ui modal">
-            <div class="content">
-                <form id="add_new_version_form" class="ui large form" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="update_type" value="new_version_upload"/>
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="code branch icon"></i>
-                            <input type="text" name="version" maxlength="15" required placeholder="New Version">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="file archive icon"></i>
-                            <input type="file" name="host_file" accept=".zip" required/>
-                        </div>
-                    </div>
-                    <div class="field ui white segment">
-                        <div class="ui toggle checkbox">
-                            <input type="hidden" name="set_current_version" value="0">
-                            <input type="checkbox" name="set_current_version" value="1">
-                            <label>Set this version as the mods Current Version? (Will automatically apply after the file is approved)</label>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" style="margin-top: 12px; height: 32px" class="sticky note icon"></i>
-                            <textarea name="add_changelogs" placeholder="Change log related to the version selected above. Each line is a log entry. (Optional, you will have a chance to change this later)"></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="actions">
-                <div class="ui red cancel inverted button">
-                    <i class="remove icon"></i>
-                        Close
-                </div>
-                <button form="add_new_version_form" type="submit" class="ui green ok inverted button">
-                    <i class="checkmark icon"></i>
-                    Add New Version
-                </button>
-            </div>
-    </div>
-
-    <div id="change_current_version_modal" class="ui modal">
-            <div class="content">
-                <form id="change_current_version_form" class="ui large form" method="POST">
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
-                            <div class="ui left icon large input">
-                                <div class="ui fluid search selection dropdown">
-                                    <i aria-hidden="true" style="color: #8f8f8f; margin-left: -5px;" class="code branch icon"></i>
-                                	<input type="hidden" name="change_version" required>
-                                	<i aria-hidden="true" class="dropdown icon"></i>
-                                	<div class="default text">Choose Version</div>
-                                	<div class="menu">
-                                        <repeat group="{{ @owner_data[all_versions] }}" value="{{ @version }}">
-                                            <div class="item" data-value="{{ @version }}">{{ @version }}</div>
-                                        </repeat>
-                                	</div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="actions">
-                <div class="ui red cancel inverted button">
-                    <i class="remove icon"></i>
-                        Close
-                </div>
-                <button form="change_current_version_form" type="submit" class="ui green ok inverted button">
-                    <i class="checkmark icon"></i>
-                    Change Current Version
-                </button>
-            </div>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            $('#change_current_version_button').on('click', function() {
-                $('#change_current_version_modal').modal('show');
-            });
-            $('#add_changelog_button').on('click', function() {
-                $('#add_changelog_modal').modal('show');
-            });
-            $('#add_new_version_button').on('click', function() {
-                $('#add_new_version_modal').modal({
-                    onApprove: function() {
-
-                        var versions = JSON.parse('{{ json_encode(@owner_data[all_versions]) }}');
-                        var form = $('#add_new_version_form');
-
-                        var version = form.find('input[name="version"]').val();
-                        if(versions.includes(version)) {
-                            //alert('There is already an upload of this mod for version ' + version + '. If you want to reupload it, please delete the old one first.');
-                            return false;
-                        }
-
-                        var file = form.find('input[name="host_file"]');
-                        if(!file.val()) {
-                            //alert('You must upload a file to complete this form.');
-                            return false;
-                        }
-
-                        return true;
-
-                    }
-                }).modal('show');
-            });
-            $('#view_pending_rejected_files_button').on('click', function() {
-                $('#pending_rejected_files_modal').modal('show');
-            });
-            $('#edit_description_button').on('click', function() {
-                $('#update_description_modal').modal({
-                    onApprove: function() {
-                        $('#edit_description').val(editor.getMarkdown());
-                        $('#edit_description_form').submit();
-                    }
-                }).modal('show');
-
-                // $('#edit_description_form').on('submit', function(e) {
-                //     alert('test');
-                // });
-
-            });
-
-            // prevent fomantic from hijacking TinyMCE modal focus
-            $(document).on('focusin', function(e) {
-              if ($(e.target).closest(".mce-window").length) {
-                e.stopImmediatePropagation();
-              }
-            });
-
-            $('.ui.checkbox').checkbox();
-        });
-    </script>
-</check>
+<style>
+    img {
+        float: left !important;
+        width:  100% !important;
+        height: 200px !important;
+        object-fit: contain !important;
+    }
+    .ui.menu:not(#site_main_menu) {
+        border-bottom: 1px solid white !important;
+        padding-top: 2px;
+    }
+    .sub.header {
+        color: inherit !important;
+    }
+    #details_submenu.ui.menu .item:not(.active) {
+        background-color: #1b1c1d;
+        color: white;
+    }
+    #details_submenu.ui.menu .item.active {
+        background-color: #3d3e3f;
+        color: white;
+    }
+</style>
+
+<set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
+
+<div class="ui primary segment">
+    <div class="ui buttons">
+        <button onclick="history.back();" class="ui primary button">Go Back</button>
+    </div>
+</div>
+
+<div class="ui white segment">
+
+    <h2 class="ui header">
+        {{ @data[info][name] }}
+        <check if="{{ !empty(@data[files][current]) }}">
+            <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
+        </check>
+        <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+    </h2>
+
+    <div id="details_submenu" class="ui top attached tabular menu">
+        <a class="item active" data-tab="information">Information</a>
+        <check if="{{ !empty(@data[files][current]) || @is_owner }}">
+            <a class="item" data-tab="downloads">Downloads</a>
+        </check>
+        <check if="{{ !empty(@data[changelogs]) }}">
+            <a class="item" data-tab="changelogs">Changelogs</a>
+        </check>
+    </div>
+    <div class="ui bottom attached tab segment inverted active" data-tab="information">
+        <div class="ui white segment">
+
+            <h3>
+                Description
+                <check if="{{ @is_owner }}">
+                    <button id="edit_description_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+
+          <div id="viewer"></div>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+        <div class="ui white segment">
+
+            <h3>
+                Other Links
+                <check if="{{ @is_owner }}">
+                    <button id="edit_description_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+
+            <ul>
+                <repeat group="{{ @data[links] }}" value="{{ @nfo }}">
+                    <li><a target="_blank" href="{{ @nfo[href] }}">{{ @nfo[description] }}</a></li>
+                </repeat>
+            </ul>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+    </div>
+    <div class="ui bottom attached tab inverted segment" data-tab="changelogs">
+        <div class="ui white segment">
+
+            <h2>Changelogs</h2>
+
+            <div class="ui styled fluid accordion" style="color: black;">
+                <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Version {{ @version }}
+                    </div>
+                    <div class="content">
+                        <ul>
+                            <repeat group="{{ @logs }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </div>
+                </repeat>
+            </div>
+
+
+            <ul>
+                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                    <li>{{ @log }}</li>
+                </repeat>
+            </ul>
+
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+    </div>
+    <div class="ui bottom attached tab inverted segment" data-tab="downloads">
+
+        <check if="{{ @is_owner }}">
+            <div class="ui primary segment">
+                <button id="add_new_version_button"  class="ui primary button">New Version</button>
+                <button id="change_current_version_button" class="ui secondary button">Change Current Version</button>
+                <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
+                <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
+            </div>
+        </check>
+
+        <div class="ui styled fluid accordion" style="color: black;">
+
+            <check if="{{ !empty(@data[files][current] )}}">
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    Current Version - {{ @data[files][current][version] }}
+                </div>
+                <div class="active content">
+                    <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
+                    <check if="{{ !empty(@data[changelogs][@data[files][current][version]]) }}">
+                        <h3>Changelog</h3>
+                        <ul>
+                            <repeat group="{{ @data[changelogs][@data[files][current][version]] }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </check>
+                </div>
+            </check>
+            <check if="{{ !empty(@data[files][other]) }}">
+                <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Other Version - {{ @file[version] }}
+                    </div>
+                    <div class="content">
+                        <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Other Version</a>
+                        <check if="{{ !empty(@data[changelogs][@file[version]]) }}">
+                            <h3>Changelog</h3>
+                            <ul>
+                                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                                    <li>{{ @log }}</li>
+                                </repeat>
+                            </ul>
+                        </check>
+                    </div>
+                </repeat>
+            </check>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+
+        var editor = new Editor({
+            el: document.querySelector('#editor'),
+            height: '500px',
+            initialEditType: 'wysiwyg',
+            previewStyle: 'vertical',
+            initialValue: $('#edit_description').val()
+        });
+        editor.removeToolbarItem('image');
+
+        var viewer = $('#viewer');
+        viewer.html(editor.getHTML());
+
+        //dynamically add table styling from generated markdown html
+        viewer.find('table').addClass('ui striped compact celled sortable inverted table')
+
+    });
+</script>

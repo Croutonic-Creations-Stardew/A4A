@@ -27,7 +27,32 @@ $f3->config('app/application/routes.ini');
 $f3->map('/', "modules\\{$f3->get('defaultModule')}\\Controller");
 
 //setup grumpypdo as db
-$f3->set('db', new GrumpyPDO($f3->get('db_host'), $f3->get('db_username'), $f3->get('db_password'), $f3->get('db_database')));
+$db = new GrumpyPDO($f3->get('db_host'), $f3->get('db_username'), $f3->get('db_password'), $f3->get('db_database'));
+$f3->set('db', $db);
+
+if(empty($_SESSION['user']) && !empty($_COOKIE['keep_me_logged_in'])) {
+    $token_details = json_decode($_COOKIE['keep_me_logged_in'], true);
+
+    if($token = $db->row("SELECT user_id, hash FROM users_login_tokens WHERE user_id=? AND hash=?", [$token_details['user_id'], $token_details['hash']])) {
+
+        //log in user
+        $user = $db->row('SELECT * FROM users WHERE uid=?', [$token['user_id']]);
+        unset($user['password']);
+        $_SESSION['user'] = $user;
+
+        //regenerate new login token
+        $token = [
+            'user_id' => $_SESSION['user']['uid'],
+            'hash' => password_hash($_SESSION['user']['uid'], PASSWORD_DEFAULT)
+        ];
+
+        $db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$token['user_id']]);
+        $db->insert('users_login_tokens', $token);
+        setcookie("keep_me_logged_in", json_encode($token));
+
+    }
+
+}
 
 //calculate page load time
 $f3->set('loadtime', round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
