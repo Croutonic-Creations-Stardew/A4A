@@ -201,15 +201,12 @@
 
 <script>
     $(document).ready(function() {
-        $('.menu .item').tab();
-        $('.ui.accordion').accordion();
 
         var viewer = $('#viewer');
         viewer.html(editor.getHTML());
 
         //dynamically add table styling from generated markdown html
         viewer.find('table').addClass('ui striped compact celled sortable inverted table')
-
 
     });
 </script>

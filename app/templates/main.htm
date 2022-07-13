@@ -14,6 +14,8 @@
 		<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 		<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.min.js" integrity="sha512-Fhm8fcAQhENO1HmU1JjbnNm6ReszFIiJvkHdnuGZBznaaM6vakH4YEPO7v8M3PbGR03R/dur0QP5vZ5s4YaN7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 		<style>
 			div.toastui-editor-main.toastui-editor-md-mode {
 				background-color: #f7f1f1;
@@ -97,6 +99,13 @@
 
 <script>
 	$(document).ready(function() {
+
+		$('.menu .item').tab({
+	    	history: true,
+	    	historyType: 'hash'
+	  	});
+        $('.ui.accordion').accordion();
+
 		//adjust main window offset to clear the menu header
 		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 20 + 'px');
 
