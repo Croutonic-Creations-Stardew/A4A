@@ -97,6 +97,7 @@ class Mods extends \Model {
         ', [$mod_catalog_id]);
 
         $output['changelogs'] = $this->db->run("SELECT log, version FROM mod_catalog_changelogs WHERE mod_catalog_id=?", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
+        $output['links'] = $this->db->keypair("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id]);
 
         $current_file = null;
         $files = $this->db->all("SELECT * FROM mod_attached_files WHERE status=4 AND mod_catalog_id=?", [$mod_catalog_id]);

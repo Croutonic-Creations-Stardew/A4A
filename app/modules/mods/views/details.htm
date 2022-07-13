@@ -69,6 +69,23 @@
 
             <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
+        <div class="ui white segment">
+
+            <h3>
+                Other Links
+                <check if="{{ @is_owner }}">
+                    <button id="edit_description_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+
+            <ul>
+                <repeat group="{{ @data[links] }}" value="{{ @nfo }}">
+                    <li><a target="_blank" href="{{ @nfo[href] }}">{{ @nfo[description] }}</a></li>
+                </repeat>
+            </ul>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="changelogs">
         <h2 class="ui header">
