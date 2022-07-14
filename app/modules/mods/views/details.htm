@@ -30,7 +30,9 @@
 
 <div class="ui primary segment">
     <div class="ui buttons">
-        <button onclick="history.back();" class="ui primary button">Go Back</button>
+        <check if="{{ @a4a_referer }}">
+            <a href="{{ @_SERVER['HTTP_REFERER'] }}" class="ui primary button">Go Back</a>
+        </check>
     </div>
 </div>
 

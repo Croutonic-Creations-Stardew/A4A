@@ -6,6 +6,16 @@
                         <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
                         <textarea id="edit_description" name="change_description" style="display: none;" required>{{ @data[info][description] }}</textarea>
                         <div id="editor" style="width: 100%"></div>
+                        <script>
+                            var editor = new Editor({
+                                el: document.querySelector('#editor'),
+                                height: '500px',
+                                initialEditType: 'wysiwyg',
+                                previewStyle: 'vertical',
+                                initialValue: $('#edit_description').val()
+                            });
+                            editor.removeToolbarItem('image');
+                        </script>
                     </div>
                 </div>
             </form>

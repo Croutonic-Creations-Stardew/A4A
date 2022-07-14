@@ -30,6 +30,8 @@ $f3->map('/', "modules\\{$f3->get('defaultModule')}\\Controller");
 $db = new GrumpyPDO($f3->get('db_host'), $f3->get('db_username'), $f3->get('db_password'), $f3->get('db_database'));
 $f3->set('db', $db);
 
+$f3->set('a4a_referer', preg_match("/https:\/\/{$_SERVER[HTTP_HOST]}/", $_SERVER[HTTP_REFERER]));
+
 if(empty($_SESSION['user']) && !empty($_COOKIE['keep_me_logged_in'])) {
     $token_details = json_decode($_COOKIE['keep_me_logged_in'], true);
 
