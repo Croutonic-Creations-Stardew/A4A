@@ -99,6 +99,8 @@ class Mods extends \Model {
         $output['changelogs'] = $this->db->run("SELECT log, version FROM mod_catalog_changelogs WHERE mod_catalog_id=?", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
         $output['links'] = $this->db->keypair("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id]);
 
+        $output['game_info'] = $this->db->row("SELECT * FROM games WHERE uid=?", [$output['info']['game_id']]);
+
         $current_file = null;
         $files = $this->db->all("SELECT * FROM mod_attached_files WHERE status=4 AND mod_catalog_id=?", [$mod_catalog_id]);
 
@@ -128,22 +130,27 @@ class Mods extends \Model {
             'current_version' => $data['version']
         ]);
 
+        $this->update_mod_links($catalog_id, $data['link_file'], $data['link_file_description']);
+
         if(!empty($data['changelog'])) {
             $logs = array_values(array_filter(explode(PHP_EOL, $_POST['changelog'])));
             $this->post_changelogs($catalog_id, $data['version'], $logs);
         }
 
-        foreach($data['link_file'] ?: [] as $key => $link) {
-            $description = $data['link_file_description'][$key];
+        return $catalog_id;
+
+    }
+
+    public function update_mod_links($mod_catalog_id, $links, $link_descriptions) {
+        $this->db->run('DELETE FROM mod_attached_links WHERE mod_catalog_id=?', [$mod_catalog_id]);
+        foreach($links ?: [] as $key => $link) {
+            $description = $link_descriptions[$key];
             $this->db->insert('mod_attached_links', [
-                'mod_catalog_id' => $catalog_id,
+                'mod_catalog_id' => $mod_catalog_id,
                 'href' => $link,
                 'description' => $description
             ]);
         }
-
-        return $catalog_id;
-
     }
 
 }

@@ -54,6 +54,9 @@ class controller extends \Controller {
 							$filehost = $this->model('Filehost');
 							$filehost->upload_file($mod_catalog_id, $_POST['version'], $_FILES['host_file'], $_POST['set_current_version']);
 							break;
+						case 'edit_attached_links':
+							$mods->update_mod_links($mod_catalog_id, $_POST['link_file'], $_POST['link_file_description']);
+							break;
 					}
 				}
 
