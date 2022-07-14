@@ -31,7 +31,12 @@
 <div class="ui primary segment">
     <div class="ui buttons">
         <check if="{{ @a4a_referer }}">
-            <a href="{{ @_SERVER['HTTP_REFERER'] }}" class="ui primary button">Go Back</a>
+            <true>
+                <a href="{{ @_SERVER['HTTP_REFERER'] }}" class="ui primary button">Go Back</a>
+            </true>
+            <false>
+                <a href="/mods?game_id={{ @data[game_info][uid] }}" class="ui primary button">View More for {{ @data[game_info][name] }}</a>
+            </false>
         </check>
     </div>
 </div>
