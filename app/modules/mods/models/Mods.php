@@ -36,6 +36,9 @@ class Mods extends \Model {
 
     public function post_changelogs($mod_catalog_id, $version, $logs) {
         foreach($logs as $log) {
+            if(empty($log)) {
+                continue;
+            }
             $this->db->run("INSERT INTO mod_catalog_changelogs (mod_catalog_id, log, version) VALUES (?, ?, ?)", [$mod_catalog_id, $version, $log]);
         }
     }
@@ -96,7 +99,7 @@ class Mods extends \Model {
                 mc.uid=?
         ', [$mod_catalog_id]);
 
-        $output['changelogs'] = $this->db->run("SELECT log, version FROM mod_catalog_changelogs WHERE mod_catalog_id=?", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
+        $output['changelogs'] = $this->db->run("SELECT version, log FROM mod_catalog_changelogs WHERE mod_catalog_id=?", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
         $output['links'] = $this->db->keypair("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id]);
 
         $output['game_info'] = $this->db->row("SELECT * FROM games WHERE uid=?", [$output['info']['game_id']]);

@@ -185,7 +185,30 @@
         viewer.html(editor.getHTML());
 
         //dynamically add table styling from generated markdown html
-        viewer.find('table').addClass('ui striped compact celled sortable inverted table')
+        viewer.find('table').addClass('ui striped compact celled sortable inverted table');
+        viewer.find('a').each(function(index, value) {
+
+            const tmp = document.createElement('a');
+            tmp.href = value.href;
+
+            if(tmp.host !== window.location.host) {
+                $(this).attr('target', '_blank');
+            }
+
+        });
+        viewer.find(':header').each(function(index, value) {
+
+            var text = this.innerText;
+
+            var slug = text.toLowerCase()
+                           .trim()
+                           .replace(/[^\w\s-]/g, '')
+                           .replace(/[\s_-]+/g, '-')
+                           .replace(/^-+|-+$/g, '');
+
+            $(this).attr('id', slug);
+
+        });
 
     });
 </script>
