@@ -156,19 +156,23 @@ class controller extends \Controller {
 		$file = "{$mod_info['path']}{$mod_info['filename']}";
 
 		if (file_exists($file)) {
-		   header('Content-Description: File Transfer');
-		   header('Content-Type: application/octet-stream');
-		   header('Content-Disposition: attachment; filename='.basename($file));
-		   header('Expires: 0');
-		   header('Cache-Control: must-revalidate');
-		   header('Pragma: public');
-		   header('Content-Length: ' . filesize($file));
-		   ob_clean();
-		   flush();
-		   readfile($file);
-		   exit;
+
+		   	header('Content-Description: File Transfer');
+		   	header('Content-Type: application/octet-stream');
+		   	header('Content-Disposition: attachment; filename='.basename($file));
+		   	header('Expires: 0');
+		   	header('Cache-Control: must-revalidate');
+		   	header('Pragma: public');
+		   	header('Content-Length: ' . filesize($file));
+		   	ob_clean();
+		   	flush();
+		   	readfile($file);
+
+			$filehost->log_download($mod_info['uid'], $mod_info['mod_catalog_id']);
+
+		   	exit;
 	   } else {
-		   die("File {$mod_info['filename']} could not be found...");
+		   	die("File {$mod_info['filename']} could not be found...");
 	   }
 	}
 

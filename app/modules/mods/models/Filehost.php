@@ -2,6 +2,10 @@
 namespace modules\mods\models;
 class Filehost extends \Model {
 
+    public function log_download($game_catalog_id, $mod_attached_file_id) {
+        $this->db->run('INSERT into mod_file_downloads (game_catalog_id, mod_attached_file_id) VALUES (?, ?)', [$game_catalog_id, $mod_attached_file_id]);
+    }
+
     public function get_file_info($file_id) {
         return $this->db->row('SELECT * FROM mod_attached_files WHERE uid=?', [$file_id]);
     }
